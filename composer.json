@@ -1,5 +1,6 @@
 {
     "name": "bunkermaster/multiproc",
+    "description": "Simple multi processing with native PHP",
     "type": "library",
     "require-dev": {
         "symfony/var-dumper": "^3.3",
@@ -12,5 +13,15 @@
             "email": "bunkermaster@gmail.com"
         }
     ],
-    "require": {}
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Master\\": "src/Master",
+            "Helper\\": "src/Helper",
+            "Servant\\": "src/Servant"
+        }
+    },
+    "require": {
+        "php": ">=7.1.0"
+    }
 }
