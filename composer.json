@@ -16,6 +16,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
+            "Excception\\": "src/Exception",
             "Master\\": "src/Master",
             "Helper\\": "src/Helper",
             "Servant\\": "src/Servant"
