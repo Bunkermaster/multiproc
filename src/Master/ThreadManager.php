@@ -5,11 +5,11 @@ namespace Master;
 use Exception\ScriptNotFoundException;
 
 /**
- * Class Thread
+ * Class ThreadManager
  * @author Yann Le Scouarnec <bunkermaster@gmail.com>
  * @package Master
  */
-class Thread
+class ThreadManager
 {
     private $startTime = null; // set on construct
     private $endTime = null; // calculated from $startTime + $timeout
