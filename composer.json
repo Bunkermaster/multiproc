@@ -1,0 +1,16 @@
+{
+    "name": "bunkermaster/multiproc",
+    "type": "library",
+    "require-dev": {
+        "symfony/var-dumper": "^3.3",
+        "phpunit/phpunit": "^6.2"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "bunkermaster",
+            "email": "bunkermaster@gmail.com"
+        }
+    ],
+    "require": {}
+}
