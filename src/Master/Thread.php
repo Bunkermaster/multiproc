@@ -2,6 +2,8 @@
 
 namespace Master;
 
+use Exception\ScriptNotFoundException;
+
 /**
  * Class Thread
  * @author Yann Le Scouarnec <bunkermaster@gmail.com>
@@ -19,28 +21,38 @@ class Thread
 
     /**
      * Thread constructor.
-     * @param string $script
-     * @param int $timeout
-     * @param array $args
+     * @param string $script script to execute in new CLI thread
+     * @param int $timeout in seconds
+     * @param array $args script arguments
+     * @throws ScriptNotFoundException script not found
      */
     public function __construct(string $script, int $timeout = 1, array $args = [])
     {
+        $this->startTime = microtime(true);
         $this->script = $script;
         if(!file_exists($script)){
-            throw new
+            throw new ScriptNotFoundException('Script requested "'.$script.'"was not found on filesystem');
         }
         $this->timeout = $timeout;
         $this->args = $args;
     }
 
-    /*
+    /**
      *  retourne null si script pas fini, une chaine avec le résultat du traitement dans tout autre cas
+     * @return null|string
      */
     public function result(): ?string
     {
-
+        return null;
     }
 
-    public function terminate(): bool; // tue le PID de la thread et nettoie le $commFile
+    /**
+     * tue le PID de la thread et nettoie le $commFile
+     * @return bool
+     */
+    public function terminate(): bool
+    {
+        return false;
+    }
 
 }
