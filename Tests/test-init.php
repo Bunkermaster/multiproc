@@ -9,4 +9,7 @@ use \Master\ThreadManager;
 
 require_once "./autoload.php";
 
-$thread = new ThreadManager(__DIR__."/simple-sleep-thread-test.php");
+$thread = new ThreadManager(__DIR__."/simple-sleep-thread-test.php", 12, []);
+while (is_null($thread->result())) {
+    usleep(500);
+}

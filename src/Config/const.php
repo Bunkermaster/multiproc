@@ -14,3 +14,4 @@ const OUTPUT_FILE_EXTENSION = ".out";
 const OPTION_FLAG_TIMEOUT = "T"; // CLI option
 const OPTION_FLAG_UID = "u"; // CLI option
 const DEFAULT_TIME_OUT = 1; // expressed in seconds
+const PID_FILE_CREATION_TIME_OUT = 1; // expressed in seconds
