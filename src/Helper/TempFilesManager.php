@@ -33,9 +33,9 @@ class TempFilesManager
             throw new \Exception('Exception if temp dir does not have 1MB free space');
         }
         $this->fileName = $tempDir."/".$fileName;
-        if (file_exists($this->fileName)) {
+        if (!is_null($content) && file_exists($this->fileName)) {
             // @todo Exception if temp temp file failed to create
-            throw new \Exception('Exception if temp temp file failed to create');
+            throw new \Exception('Exception if temp temp file failed to create ('.$this->fileName.')');
         }
         if (!is_null($content)) {
             $this->output($content);

@@ -54,8 +54,8 @@ class ThreadManager
         $execLimit = $this->startTime + $this->timeout;
         $commandLine = 'php '.$this->script.
             ' -'.OPTION_FLAG_UID.$this->uniqueId.
-            ' -'.OPTION_FLAG_TIMEOUT.$execLimit;
-        die($commandLine);
+            ' -'.OPTION_FLAG_TIMEOUT.$execLimit.
+            ' > /dev/null 2>/dev/null &';
         exec($commandLine);
         $pidFile = new TempFilesManager(TEMP_FILE_PREFIX.$this->uniqueId.PROCESS_ID_FILE_EXTENSION);
         $this->processIdFile = $pidFile->getFileName();
@@ -72,7 +72,7 @@ class ThreadManager
         }
         if ($noPidFile) {
             // @todo Exception if process id file is not present
-            throw new \Exception('process id file is not present');
+            throw new \Exception('process id file is not present ('.$this->processIdFile.')');
         }
     }
 
@@ -82,7 +82,7 @@ class ThreadManager
      */
     public function result(): ?string
     {
-        if (file_exists($this->processIdFile)) {
+        if (file_exists($this->commFile)) {
             return file_get_contents($this->commFile);
         }
         return null;
@@ -97,4 +97,19 @@ class ThreadManager
         return posix_kill($this->processId, SIGINT);
     }
 
+    /**
+     * @return bool|null|string
+     */
+    public function getProcessId()
+    {
+        return $this->processId;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getUniqueId()
+    {
+        return $this->uniqueId;
+    }
 }
