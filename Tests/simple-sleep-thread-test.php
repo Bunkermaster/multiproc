@@ -9,5 +9,5 @@ require_once "./autoload.php";
 
 \Servant\Thread::init();
 
-sleep(1);
+sleep(10);
 echo "Bingo!";

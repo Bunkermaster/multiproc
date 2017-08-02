@@ -17,7 +17,8 @@ class ThreadManager
     private $timeout = null; // int set on construct
     private $args = null; // array set on construct
     private $commFile = null; // set on construct
-    private $pid = null; // int process id set on construct
+    private $processId = null; // int process id set on construct
+    private $uniqueId = null; // thread unique ID
 
     /**
      * Thread constructor.
@@ -30,7 +31,7 @@ class ThreadManager
     {
         $this->startTime = microtime(true);
         $this->script = $script;
-        if(!file_exists($script)){
+        if (!file_exists($script)) {
             throw new ScriptNotFoundException('Script requested "'.$script.'"was not found on filesystem');
         }
         $this->timeout = $timeout;

@@ -23,7 +23,7 @@
             "Servant\\": "src/Servant"
         },
         "files": [
-            "src/Config/main.php"
+            "src/Config/init.php"
         ]
     },
     "require": {
