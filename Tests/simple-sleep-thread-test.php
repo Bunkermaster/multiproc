@@ -7,5 +7,7 @@
  */
 require_once "./autoload.php";
 
-sleep(10);
+\Servant\Thread::init();
+
+sleep(1);
 echo "Bingo!";

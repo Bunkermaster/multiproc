@@ -23,6 +23,7 @@
         }
     },
     "require": {
-        "php": ">=7.1.0"
+        "php": ">=7.1.0",
+        "symfony/process": "^4.0@dev"
     }
 }
