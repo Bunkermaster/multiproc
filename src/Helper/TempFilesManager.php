@@ -1,8 +1,8 @@
 <?php
 
-namespace Helper;
+namespace Bunkermaster\Multiproc\Helper;
 
-use const Config\MIN_TEMP_DIR_FREE_SPACE;
+use const Bunkermaster\Multiproc\Config\MIN_TEMP_DIR_FREE_SPACE;
 
 /**
  * Class TemporaryFilesManager
@@ -34,7 +34,7 @@ class TempFilesManager
         }
         $this->fileName = $tempDir."/".$fileName;
         if (!is_null($content) && file_exists($this->fileName)) {
-            // @todo Exception if temp temp file failed to create
+            // @todo Exception if temp file failed to create
             throw new \Exception('Exception if temp temp file failed to create ('.$this->fileName.')');
         }
         if (!is_null($content)) {

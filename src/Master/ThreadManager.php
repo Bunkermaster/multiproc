@@ -1,8 +1,8 @@
 <?php
 
-namespace Master;
+namespace Bunkermaster\Multiproc\Master;
 
-use const Config\{
+use const Bunkermaster\Multiproc\Config\{
     DEFAULT_TIME_OUT,
     OPTION_FLAG_TIMEOUT,
     OUTPUT_FILE_EXTENSION,
@@ -11,8 +11,8 @@ use const Config\{
     TEMP_FILE_PREFIX,
     OPTION_FLAG_UID
 };
-use Exception\ScriptNotFoundException;
-use Helper\TempFilesManager;
+use Bunkermaster\Multiproc\Exception\ScriptNotFoundException;
+use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
 /**
  * Class ThreadManager
@@ -30,6 +30,7 @@ class ThreadManager
     private $processIdFile = null; // set on construct
     private $processId = null; // int process id set on construct
     private $uniqueId = null; // thread unique ID
+    private $output = null; // thread output
 
     /**
      * Thread constructor.
@@ -83,12 +84,16 @@ class ThreadManager
      */
     public function result(): ?string
     {
+        if (!is_null($this->output)) {
+            return $this->output;
+        }
         if (file_exists($this->commFile)) {
-            $content = file_get_contents($this->commFile);
+            $this->output = file_get_contents($this->commFile);
+            // @fixme y'a de la merde ici!
             // cleanup
             $this->cleanupCommFile();
             $this->cleanupPidFile();
-            return $content;
+            return $this->output;
         }
         return null;
     }
