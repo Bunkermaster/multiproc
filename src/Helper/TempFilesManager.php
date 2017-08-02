@@ -50,7 +50,7 @@ class TempFilesManager
     {
         if (!file_put_contents($this->fileName, $content)) {
             // @todo Exception if temp file failed to write
-            throw new \Exception('Exception if temp file failed to write');
+            throw new \Exception('Exception if temp file failed to write ('.$this->fileName.')');
         }
     }
 

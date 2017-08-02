@@ -3,6 +3,7 @@
 namespace Servant;
 
 use const Config\{
+    DEFAULT_TIME_OUT,
     OPTION_FLAG_TIMEOUT,
     OUTPUT_FILE_EXTENSION,
     OPTION_FLAG_UID,
@@ -40,8 +41,9 @@ class Thread
     /**
      * Thread init.
      */
-    public static function init()
+    public static function init() :  void
     {
+        // output buffer capture for output file
         ob_start();
         // check call context
         self::check();
@@ -57,19 +59,45 @@ class Thread
      * @throws NoUidSpecifiedException
      * @throws ProcessIdNotFoundException
      */
-    private static function check()
+    private static function check() : void
     {
         if (!isset(getopt(OPTION_FLAG_UID.':hp:')[OPTION_FLAG_UID])
             || false === self::$uniqueId = getopt('u:hp:')['u']) {
             throw new NoUidSpecifiedException(__FILE__." was called without a UID in --uid CLI option.");
         }
-        if (isset(getopt(OPTION_FLAG_TIMEOUT.':hp:')[OPTION_FLAG_TIMEOUT])
-            && self::$timeout = getopt(OPTION_FLAG_TIMEOUT.':hp:')[OPTION_FLAG_TIMEOUT]
-        ) {
-            throw new NoUidSpecifiedException(__FILE__." was called without a UID in --uid CLI option.");
+        if (isset(getopt(OPTION_FLAG_TIMEOUT.':hp:')[OPTION_FLAG_TIMEOUT])) {
+            self::$timeout = getopt(OPTION_FLAG_TIMEOUT.':hp:')[OPTION_FLAG_TIMEOUT];
+        } else {
+            self::$timeout = microtime(true) + (float) DEFAULT_TIME_OUT;
         }
         if (false === self::$processId = getmypid()) {
             throw new ProcessIdNotFoundException(__FILE__.' was unable to get its process ID.');
+        }
+    }
+
+    /**
+     * Delete the pid file when terminating the script execution
+     * @throws \Exception
+     */
+    public static function cleanPidFile() : void
+    {
+        if (false === unlink(self::$processIdFile)) {
+            // @todo Exception if the process ID file could not be deleted
+            throw new \Exception('the process ID file could not be deleted');
+        }
+    }
+
+    /**
+     * kills current script if timeout
+     */
+    public static function checkTimeout()
+    {
+        if (microtime(true) > self::getTimeout()) {
+            self::$output = json_encode(["An error occured, timeout was reached",
+                microtime(true) - self::getTimeout(),
+                ob_get_clean()
+                ]);
+            exit;
         }
     }
 
@@ -122,9 +150,9 @@ class Thread
     }
 
     /**
-     * @return null
+     * @return float|null
      */
-    public static function getTimeout()
+    public static function getTimeout() : ?float
     {
         return self::$timeout;
     }

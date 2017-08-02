@@ -12,16 +12,10 @@ use Servant\Thread;
 // init constants
 require_once __DIR__.DIRECTORY_SEPARATOR."const.php";
 
-// init tick for timeout check
-declare(ticks=1);
-register_tick_function('Config\checkTimeout', true);
-
 /**
  *
  */
 function checkTimeout()
 {
-    if (!is_null(Thread::getTimeout())) {
-
-    }
+    Thread::checkTimeout();
 }

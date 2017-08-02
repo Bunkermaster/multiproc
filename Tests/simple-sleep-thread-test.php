@@ -8,6 +8,10 @@
 require_once "./autoload.php";
 
 \Servant\Thread::init();
-
-sleep(10);
+// init tick for timeout check
+declare(ticks=1);
+register_tick_function('Config\checkTimeout');
+for ($i = 0; $i < 10; $i++) {
+    sleep(1);
+}
 echo "Bingo!";

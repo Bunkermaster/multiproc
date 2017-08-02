@@ -15,7 +15,11 @@ class CleanUp
 {
     public function __destruct()
     {
-        Thread::setOutput(ob_get_clean());
+        // if Thread::output is not null, an error set it before the normal ending of the process
+        // in that case, we keep the error message
+        if (is_null(Thread::getOutput())) {
+            Thread::setOutput(ob_get_clean());
+        }
         new TempFilesManager(Thread::getOutputFile(), Thread::getOutput());
     }
 }
