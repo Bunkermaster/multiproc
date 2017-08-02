@@ -20,8 +20,6 @@ class CleanUp
         if (is_null(Thread::getOutput())) {
             Thread::setOutput(ob_get_clean());
         }
-        // cleanup pid file
-//        Thread::cleanPidFile();
         new TempFilesManager(Thread::getOutputFile(), Thread::getOutput());
     }
 }

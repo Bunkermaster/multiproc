@@ -76,18 +76,6 @@ class Thread
     }
 
     /**
-     * Delete the pid file when terminating the script execution
-     * @throws \Exception
-     */
-    public static function cleanPidFile() : void
-    {
-        if (false === unlink(self::$processIdFile)) {
-            // @todo Exception if the process ID file could not be deleted
-            throw new \Exception('the process ID file could not be deleted');
-        }
-    }
-
-    /**
      * kills current script if timeout
      */
     public static function checkTimeout()
