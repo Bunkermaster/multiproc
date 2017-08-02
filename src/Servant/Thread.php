@@ -22,7 +22,15 @@ class Thread
      */
     public static function init()
     {
+        // check call context
         self::check();
+        // create communication files
+
+    }
+
+    public static function finalize()
+    {
+
     }
 
     /**
