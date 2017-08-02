@@ -87,6 +87,7 @@ class ThreadManager
             $content = file_get_contents($this->commFile);
             // cleanup
             $this->cleanupCommFile();
+            $this->cleanupPidFile();
             return $content;
         }
         return null;
@@ -104,12 +105,25 @@ class ThreadManager
     }
 
     /**
+     * Delete the pid file when terminating the script execution
+     * @throws \Exception
+     */
+    public function cleanupPidFile() : void
+    {
+        if (false === unlink($this->processIdFile)) {
+            // @todo Exception if the process ID file could not be deleted
+            throw new \Exception('the process ID file could not be deleted');
+        }
+    }
+
+    /**
      * kill thread and clean $commFile
      * @return bool
      */
     public function terminate(): bool
     {
         $this->cleanupCommFile();
+        $this->cleanupPidFile();
         return posix_kill($this->processId, SIGINT);
     }
 
