@@ -5,7 +5,7 @@
  * Date: 01/08/2017
  * Time: 17:22
  */
-use \Master\ThreadManager;
+use Bunkermaster\Multiproc\Master\ThreadManager;
 
 require_once "./autoload.php";
 

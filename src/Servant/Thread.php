@@ -1,8 +1,8 @@
 <?php
 
-namespace Servant;
+namespace Bunkermaster\Multiproc\Servant;
 
-use const Config\{
+use const Bunkermaster\Multiproc\Config\{
     DEFAULT_TIME_OUT,
     OPTION_FLAG_TIMEOUT,
     OUTPUT_FILE_EXTENSION,
@@ -10,11 +10,11 @@ use const Config\{
     PROCESS_ID_FILE_EXTENSION,
     TEMP_FILE_PREFIX
 };
-use Exception\{
+use Bunkermaster\Multiproc\Exception\{
     NoUidSpecifiedException,
     ProcessIdNotFoundException
 };
-use Helper\TempFilesManager;
+use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
 /**
  * Class Thread (static)

@@ -16,11 +16,11 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "Config\\": "src/Config",
-            "Exception\\": "src/Exception",
-            "Master\\": "src/Master",
-            "Helper\\": "src/Helper",
-            "Servant\\": "src/Servant"
+            "Bunkermaster\\Multiproc\\Config\\": "src/Config",
+            "Bunkermaster\\Multiproc\\Exception\\": "src/Exception",
+            "Bunkermaster\\Multiproc\\Master\\": "src/Master",
+            "Bunkermaster\\Multiproc\\Helper\\": "src/Helper",
+            "Bunkermaster\\Multiproc\\Servant\\": "src/Servant"
         },
         "files": [
             "src/Config/init.php"

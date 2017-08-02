@@ -1,8 +1,8 @@
 <?php
 
-namespace Servant;
+namespace Bunkermaster\Multiproc\Servant;
 
-use Helper\TempFilesManager;
+use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
 /**
  * Class CleanUp

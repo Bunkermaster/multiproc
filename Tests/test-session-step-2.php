@@ -5,7 +5,7 @@
  * Date: 02/08/2017
  * Time: 17:32
  */
-use \Master\ThreadManager;
+use Bunkermaster\Multiproc\Master\ThreadManager;
 
 session_start();
 header('Content-Type: text/event-stream');

@@ -1,8 +1,8 @@
 <?php
 
-namespace Master;
+namespace Bunkermaster\Multiproc\Master;
 
-use const Config\{
+use const Bunkermaster\Multiproc\Config\{
     DEFAULT_TIME_OUT,
     OPTION_FLAG_TIMEOUT,
     OUTPUT_FILE_EXTENSION,
@@ -11,8 +11,8 @@ use const Config\{
     TEMP_FILE_PREFIX,
     OPTION_FLAG_UID
 };
-use Exception\ScriptNotFoundException;
-use Helper\TempFilesManager;
+use Bunkermaster\Multiproc\Exception\ScriptNotFoundException;
+use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
 /**
  * Class ThreadManager

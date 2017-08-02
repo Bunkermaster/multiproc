@@ -13,7 +13,7 @@ Instanciate ```\Master\ThreadManager```. When you need the results, just test fo
  
 ```php
 <?php
-use \Master\ThreadManager;
+use Bunkermaster\Multiproc\Master\ThreadManager;
 
 require_once "./autoload.php";
 
@@ -42,7 +42,7 @@ register_tick_function('Config\checkTimeout');
 <?php
 require_once "vendor/autoload.php";
 
-\Servant\Thread::init();
+Bunkermaster\Multiproc\Servant\Thread::init();
 // init tick for timeout check
 declare(ticks=1);
 register_tick_function('Config\checkTimeout');

@@ -5,7 +5,7 @@
  * Date: 02/08/2017
  * Time: 12:55
  */
-namespace Config;
+namespace Bunkermaster\Multiproc\Config;
 
 use Servant\Thread;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Exception;
+namespace Bunkermaster\Multiproc\Exception;
 
 /**
  * Class NoUidSpecifiedException

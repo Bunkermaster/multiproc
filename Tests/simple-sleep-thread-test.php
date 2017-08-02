@@ -7,10 +7,10 @@
  */
 require_once "./autoload.php";
 
-\Servant\Thread::init();
+Bunkermaster\Multiproc\Servant\Thread::init();
 // init tick for timeout check
 declare(ticks=1);
-register_tick_function('Config\checkTimeout');
+register_tick_function('Bunkermaster\Multiproc\Config\checkTimeout');
 for ($i = 0; $i < 10; $i++) {
     sleep(1);
 }

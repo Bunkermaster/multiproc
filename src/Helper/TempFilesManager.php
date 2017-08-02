@@ -1,8 +1,8 @@
 <?php
 
-namespace Helper;
+namespace Bunkermaster\Multiproc\Helper;
 
-use const Config\MIN_TEMP_DIR_FREE_SPACE;
+use const Bunkermaster\Multiproc\Config\MIN_TEMP_DIR_FREE_SPACE;
 
 /**
  * Class TemporaryFilesManager
