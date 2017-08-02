@@ -15,7 +15,7 @@ Instanciate ```\Master\ThreadManager```. When you need the results, just test fo
 <?php
 use Bunkermaster\Multiproc\Master\ThreadManager;
 
-require_once "./autoload.php";
+require_once __DIR__.DIRECTORY_SEPARATOR."autoload.php";
 
 $thread = new ThreadManager(__DIR__.DIRECTORY_SEPARATOR."yourscript.php", 12, []);
 // loop master while the servant thread does its thing
@@ -35,7 +35,7 @@ The servant requires a bit more work.
 ```php
 <?php
 declare(ticks=1);
-register_tick_function('Config\checkTimeout');
+register_tick_function('Bunkermaster\Multiproc\Servant\Thread::checkTimeout');
 ```
 * The cleanup process is handled by a simple ```\Servant\CleanUp::__destruct()``` little hack.
 ```php
@@ -45,7 +45,7 @@ require_once "vendor/autoload.php";
 Bunkermaster\Multiproc\Servant\Thread::init();
 // init tick for timeout check
 declare(ticks=1);
-register_tick_function('Config\checkTimeout');
+register_tick_function('Bunkermaster\Multiproc\Servant\Thread::checkTimeout');
 // do your thing
 echo "Results";
 ```
