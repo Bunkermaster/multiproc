@@ -79,21 +79,37 @@ class ThreadManager
     /**
      *  retourne null si script pas fini, une chaine avec le résultat du traitement dans tout autre cas
      * @return null|string
+     * @throws \Exception
      */
     public function result(): ?string
     {
         if (file_exists($this->commFile)) {
-            return file_get_contents($this->commFile);
+            $content = file_get_contents($this->commFile);
+            // cleanup
+            $this->cleanupCommFile();
+            return $content;
         }
         return null;
     }
 
     /**
-     * tue le PID de la thread et nettoie le $commFile
+     * @throws \Exception
+     */
+    public function cleanupCommFile() : void
+    {
+        if (false === unlink($this->commFile)) {
+            // @todo Exception if the results file could not be deleted
+            throw new \Exception('The results file could not be deleted');
+        }
+    }
+
+    /**
+     * kill thread and clean $commFile
      * @return bool
      */
     public function terminate(): bool
     {
+        $this->cleanupCommFile();
         return posix_kill($this->processId, SIGINT);
     }
 
