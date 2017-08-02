@@ -7,15 +7,7 @@
  */
 namespace Bunkermaster\Multiproc\Config;
 
-use Servant\Thread;
+use Bunkermaster\Multiproc\Servant\Thread;
 
 // init constants
 require_once __DIR__.DIRECTORY_SEPARATOR."const.php";
-
-/**
- *
- */
-function checkTimeout()
-{
-    Thread::checkTimeout();
-}

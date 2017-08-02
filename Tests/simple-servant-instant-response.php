@@ -11,7 +11,5 @@ Bunkermaster\Multiproc\Servant\Thread::init();
 // init tick for timeout check
 declare(ticks=1);
 register_tick_function('Bunkermaster\Multiproc\Servant\Thread::checkTimeout');
-for ($i = 0; $i < 10; $i++) {
-    sleep(1);
-}
+sleep(1);
 echo "Bingo!";

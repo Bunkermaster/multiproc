@@ -30,6 +30,7 @@ class ThreadManager
     private $processIdFile = null; // set on construct
     private $processId = null; // int process id set on construct
     private $uniqueId = null; // thread unique ID
+    private $output = null; // thread output
 
     /**
      * Thread constructor.
@@ -83,12 +84,16 @@ class ThreadManager
      */
     public function result(): ?string
     {
+        if (!is_null($this->output)) {
+            return $this->output;
+        }
         if (file_exists($this->commFile)) {
-            $content = file_get_contents($this->commFile);
+            $this->output = file_get_contents($this->commFile);
+            // @fixme y'a de la merde ici!
             // cleanup
             $this->cleanupCommFile();
             $this->cleanupPidFile();
-            return $content;
+            return $this->output;
         }
         return null;
     }
