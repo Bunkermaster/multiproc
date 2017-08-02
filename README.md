@@ -1,1 +1,1 @@
-# multiproc
+# Bunkermaster's multiproc package
