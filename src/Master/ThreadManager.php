@@ -5,10 +5,7 @@ namespace Bunkermaster\Multiproc\Master;
 use const Bunkermaster\Multiproc\Config\{
     DEFAULT_TIME_OUT,
     OPTION_FLAG_TIMEOUT,
-    OUTPUT_FILE_EXTENSION,
     PID_FILE_CREATION_TIME_OUT,
-    PROCESS_ID_FILE_EXTENSION,
-    TEMP_FILE_PREFIX,
     OPTION_FLAG_UID
 };
 use Bunkermaster\Multiproc\Exception\ScriptNotFoundException;
