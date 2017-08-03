@@ -35,6 +35,7 @@ class ThreadManager
 
     private static $threadList = [];
     private static $threadLog = [];
+    private static $threadLogChrono = [];
     private static $threadLogEnabled = false;
 
     /**
@@ -59,15 +60,18 @@ class ThreadManager
         $this->timeout = $timeout;
         $this->args = $args;
         // temporary file names generation
-        $tempResultFile = new TempFilesManager(TEMP_FILE_PREFIX.$this->uniqueId.OUTPUT_FILE_EXTENSION);
+        $tempResultFile = new TempFilesManager(TempFileNameGenerator::getResultFileName($this->uniqueId));
+        self::log($this->uniqueId, "Temporary result file is : ".$tempResultFile->getFileName());
         $this->commFile = $tempResultFile->getFileName();
         $execLimit = $this->startTime + $this->timeout;
         $commandLine = 'php '.$this->script.
             ' -'.OPTION_FLAG_UID.$this->uniqueId.
             ' -'.OPTION_FLAG_TIMEOUT.$execLimit.
             ' > /dev/null 2>/dev/null &';
+        self::log($this->uniqueId, "Command : ".$commandLine);
         exec($commandLine);
         $pidFile = new TempFilesManager(TempFileNameGenerator::getPidFileName($this->uniqueId));
+        self::log($this->uniqueId, "Temporary result file : ".$pidFile->getFileName());
         $this->processIdFile = $pidFile->getFileName();
         // flag for absence of pid file
         $noPidFile = true;
@@ -76,11 +80,13 @@ class ThreadManager
             usleep(1000);
             if (file_exists($this->processIdFile)) {
                 $this->processId = file_get_contents($pidFile->getFileName());
+                self::log($this->uniqueId, "PID file found.");
                 $noPidFile = false;
                 break;
             }
         }
         if ($noPidFile) {
+            self::log($this->uniqueId, "No PID file found after initial wait time.");
             // @todo Exception if process id file is not present
             throw new \Exception('process id file is not present ('.$this->processIdFile.')');
         }
@@ -102,9 +108,11 @@ class ThreadManager
             // cleanup
             $this->cleanupCommFile();
             $this->cleanupPidFile();
+            // log results
+            self::log($this->uniqueId, "Result : ".PHP_EOL.$this->output);
+            $this->endTime = microtime(true);
             return $this->output;
         }
-        $this->endTime = microtime(true);
         return null;
     }
 
@@ -162,6 +170,7 @@ class ThreadManager
     public function __destruct()
     {
         // remove current thread from static thread list
+        self::log($this->uniqueId, "Killed");
         unset(self::$threadList[$this->uniqueId]);
     }
 
@@ -174,7 +183,9 @@ class ThreadManager
     public static function log(string $uniqueId, string $message) : void
     {
         if (self::$threadLogEnabled) {
-            self::$threadLog[$uniqueId][microtime(true)] = $message;
+            $timestamp = microtime(true);
+            self::$threadLog[$uniqueId][$timestamp] = $message;
+            self::$threadLogChrono[$timestamp." : ".$uniqueId] = &self::$threadLog[$uniqueId][$timestamp];
         }
     }
 
@@ -184,6 +195,54 @@ class ThreadManager
      */
     public static function toggleThreadLog(bool $flag)
     {
-        self::$threadLogEnabled = flag;
+        self::$threadLogEnabled = $flag;
+    }
+
+    /**
+     * output the log display header
+     */
+    public static function logHeader()
+    {
+        echo PHP_EOL;
+        echo "#################################################################".PHP_EOL;
+        echo "THREADS LOG".PHP_EOL;
+        echo "#################################################################".PHP_EOL;
+        if (!self::$threadLogEnabled) {
+            echo "Logs are disabled".PHP_EOL;
+        }
+    }
+
+    /**
+     * ouputs threads log
+     */
+    public static function showAllLogs()
+    {
+        self::logHeader();
+        foreach (self::$threadLog as $threadId => $thread) {
+            self::showLog($threadId);
+        }
+    }
+
+    /**
+     * ouputs threads log by chronological order
+     */
+    public static function showAllLogsChrono()
+    {
+        self::logHeader();
+        foreach (self::$threadLogChrono as $stamp => $message) {
+            echo $stamp." : ".$message.PHP_EOL;
+        }
+    }
+
+    public static function showLog(string $threadId)
+    {
+        if (!isset(self::$threadLog[$threadId])) {
+            // @todo manage Exception for thread not found in thread list
+            throw new \Exception("Thread $threadId not found");
+        }
+        echo "THREAD ID : ".$threadId.PHP_EOL;
+        foreach (self::$threadLog[$threadId] as $timeStamp => $entry) {
+            echo $threadId." : ".$timeStamp." : ".$entry.PHP_EOL;
+        }
     }
 }
