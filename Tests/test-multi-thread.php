@@ -9,8 +9,14 @@ use Bunkermaster\Multiproc\Master\ThreadManager;
 
 require_once __DIR__.DIRECTORY_SEPARATOR."autoload.php";
 
-header('Content-Type: text/event-stream');
-header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
+// change content type if not CLI
+if (PHP_SAPI !== 'cli') {
+    header('Content-Type: text/event-stream');
+    header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
+}
+
+// turn logging on
+ThreadManager::toggleThreadLog(true);
 
 $thread = new ThreadManager(__DIR__.DIRECTORY_SEPARATOR."simple-sleep-thread-test.php", 12, []);
 echo "New thread started > process id:".$thread->getProcessId().
@@ -28,3 +34,6 @@ while (is_null($thread->result())) {
 }
 echo PHP_EOL."Results ".$thread->getUniqueId()." :".PHP_EOL.$thread->result();
 echo PHP_EOL."Results ".$threadError->getUniqueId()." :".PHP_EOL.$threadError->result();
+
+ThreadManager::showAllLogs();
+ThreadManager::showAllLogsChrono();
