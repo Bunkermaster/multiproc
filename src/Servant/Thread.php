@@ -14,6 +14,7 @@ use Bunkermaster\Multiproc\Exception\{
     NoUidSpecifiedException,
     ProcessIdNotFoundException
 };
+use Bunkermaster\Multiproc\Helper\TempFileNameGenerator;
 use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
 /**
@@ -48,10 +49,10 @@ class Thread
         // check call context
         self::check();
         // create process id file
-        self::$processIdFile = TEMP_FILE_PREFIX.self::$uniqueId.PROCESS_ID_FILE_EXTENSION;
+        self::$processIdFile = TempFileNameGenerator::getPidFileName(self::$uniqueId);
         new TempFilesManager(self::$processIdFile, self::$processId);
         // construct output file name
-        self::$outputFile = TEMP_FILE_PREFIX.self::$uniqueId.OUTPUT_FILE_EXTENSION;
+        self::$outputFile = TempFileNameGenerator::getResultFileName(self::$uniqueId);
         self::$cleanUpObj = new CleanUp();
     }
 

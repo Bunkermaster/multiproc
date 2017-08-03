@@ -12,6 +12,7 @@ use const Bunkermaster\Multiproc\Config\{
     OPTION_FLAG_UID
 };
 use Bunkermaster\Multiproc\Exception\ScriptNotFoundException;
+use Bunkermaster\Multiproc\Helper\TempFileNameGenerator;
 use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
 /**
@@ -32,6 +33,10 @@ class ThreadManager
     private $uniqueId = null; // thread unique ID
     private $output = null; // thread output
 
+    private static $threadList = [];
+    private static $threadLog = [];
+    private static $threadLogEnabled = false;
+
     /**
      * Thread constructor.
      * @param string $script script to execute in new CLI thread
@@ -43,13 +48,17 @@ class ThreadManager
     public function __construct(string $script, int $timeout = DEFAULT_TIME_OUT, array $args = [])
     {
         $this->startTime = microtime(true);
+        $this->uniqueId = uniqid();
+        // add current thread to static thread list
+        self::$threadList[$this->uniqueId] = $this;
+        // log start
         $this->script = $script;
         if (!file_exists($script)) {
             throw new ScriptNotFoundException('Script requested "'.$script.'"was not found on filesystem');
         }
         $this->timeout = $timeout;
         $this->args = $args;
-        $this->uniqueId = uniqid();
+        // temporary file names generation
         $tempResultFile = new TempFilesManager(TEMP_FILE_PREFIX.$this->uniqueId.OUTPUT_FILE_EXTENSION);
         $this->commFile = $tempResultFile->getFileName();
         $execLimit = $this->startTime + $this->timeout;
@@ -58,7 +67,7 @@ class ThreadManager
             ' -'.OPTION_FLAG_TIMEOUT.$execLimit.
             ' > /dev/null 2>/dev/null &';
         exec($commandLine);
-        $pidFile = new TempFilesManager(TEMP_FILE_PREFIX.$this->uniqueId.PROCESS_ID_FILE_EXTENSION);
+        $pidFile = new TempFilesManager(TempFileNameGenerator::getPidFileName($this->uniqueId));
         $this->processIdFile = $pidFile->getFileName();
         // flag for absence of pid file
         $noPidFile = true;
@@ -95,6 +104,7 @@ class ThreadManager
             $this->cleanupPidFile();
             return $this->output;
         }
+        $this->endTime = microtime(true);
         return null;
     }
 
@@ -129,6 +139,7 @@ class ThreadManager
     {
         $this->cleanupCommFile();
         $this->cleanupPidFile();
+        $this->endTime = microtime(true);
         return posix_kill($this->processId, SIGINT);
     }
 
@@ -146,5 +157,33 @@ class ThreadManager
     public function getUniqueId()
     {
         return $this->uniqueId;
+    }
+
+    public function __destruct()
+    {
+        // remove current thread from static thread list
+        unset(self::$threadList[$this->uniqueId]);
+    }
+
+    /**
+     * adds events to thread log
+     * @param string $uniqueId
+     * @param string $message
+     * @return void
+     */
+    public static function log(string $uniqueId, string $message) : void
+    {
+        if (self::$threadLogEnabled) {
+            self::$threadLog[$uniqueId][microtime(true)] = $message;
+        }
+    }
+
+    /**
+     * toggle the log activity
+     * @param bool $flag
+     */
+    public static function toggleThreadLog(bool $flag)
+    {
+        self::$threadLogEnabled = flag;
     }
 }
