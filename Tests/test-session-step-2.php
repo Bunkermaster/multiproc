@@ -8,10 +8,12 @@
 use Bunkermaster\Multiproc\Master\ThreadManager;
 
 session_start();
+require_once "./autoload.php";
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
+// turn logging on
+ThreadManager::toggleThreadLog(true);
 
-require_once "./autoload.php";
 if (!isset($_SESSION['thread'])) {
     die('Please execute test-session-step-1.php first to set the session');
 }
@@ -21,3 +23,5 @@ while (is_null($thread->result())) {
     sleep(1);
 }
 echo PHP_EOL."Results ".$thread->getUniqueId()." :".PHP_EOL.$thread->result();
+ThreadManager::showAllLogs();
+//ThreadManager::showAllLogsChrono();
