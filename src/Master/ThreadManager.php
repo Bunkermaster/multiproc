@@ -173,7 +173,7 @@ class ThreadManager
 
     public function __destruct()
     {
-        if (session_status() !== PHP_SESSION_ACTIVE && $_SESSION['']) {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
             // remove current thread from static thread list
             self::log($this->uniqueId, "Killed");
             self::$threadLog->removeThread($this->uniqueId);
@@ -191,7 +191,7 @@ class ThreadManager
         self::checkLogInstance();
         if (self::$threadLog->isThreadLogEnabled()) {
             list($microtime, $timestamp) = explode(' ', microtime());
-            $timestamp = $timestamp . str_pad(substr($microtime, 2), 6, '0', STR_PAD_LEFT);
+            $timestamp .= str_pad(substr($microtime, 2), 6, '0', STR_PAD_LEFT);
             self::$threadLog
                 ->addThreadLog($uniqueId, $timestamp, $message)
                 ->addThreadLogChrono($uniqueId, $timestamp, $message)
@@ -254,9 +254,10 @@ class ThreadManager
      */
     public static function showAllLogsChrono() : void
     {
+        self::checkLogInstance();
         self::logHeader();
         foreach (self::$threadLog->getThreadLogChrono() as $timestamp => $message) {
-            echo $timestamp." : ".$message.PHP_EOL;
+            echo $timestamp." > ".key($message).' > '.current($message).PHP_EOL;
         }
     }
 
