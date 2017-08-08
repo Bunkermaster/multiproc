@@ -8,8 +8,13 @@
 use Bunkermaster\Multiproc\Master\ThreadManager;
 
 session_start();
+session_destroy();
+session_start();
 
 require_once "./autoload.php";
+
+// turn logging on
+ThreadManager::toggleThreadLog(true);
 
 $thread = new ThreadManager(__DIR__."/simple-sleep-thread-test.php", 12, []);
 $_SESSION['thread'] = serialize($thread);

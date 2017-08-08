@@ -3,10 +3,7 @@
 namespace Bunkermaster\Multiproc\Master;
 
 use const Bunkermaster\Multiproc\Config\{
-    DEFAULT_TIME_OUT,
-    OPTION_FLAG_TIMEOUT,
-    PID_FILE_CREATION_TIME_OUT,
-    OPTION_FLAG_UID
+    DEFAULT_TIME_OUT, OPTION_FLAG_TIMEOUT, PID_FILE_CREATION_TIME_OUT, OPTION_FLAG_UID, SESSION_THREAD_LOG
 };
 use Bunkermaster\Multiproc\Exception\ScriptNotFoundException;
 use Bunkermaster\Multiproc\Helper\TempFileNameGenerator;
@@ -19,21 +16,29 @@ use Bunkermaster\Multiproc\Helper\TempFilesManager;
  */
 class ThreadManager
 {
-    private $startTime = null; // set on construct
-    private $endTime = null; // calculated from $startTime + $timeout
-    private $script = null; // set on construct
-    private $timeout = null; // int set on construct
-    private $args = null; // array set on construct
-    private $commFile = null; // set on construct
-    private $processIdFile = null; // set on construct
-    private $processId = null; // int process id set on construct
-    private $uniqueId = null; // thread unique ID
-    private $output = null; // thread output
+    // set on construct
+    private $startTime = null;
+    // calculated from $startTime + $timeout
+    private $endTime = null;
+    // set on construct
+    private $script = null;
+    // int set on construct
+    private $timeout = null;
+    // array set on construct
+    private $args = null;
+    // set on construct
+    private $commFile = null;
+    // set on construct
+    private $processIdFile = null;
+    // int process id set on construct
+    private $processId = null;
+    // thread unique ID
+    private $uniqueId = null;
+    // thread output
+    private $output = null;
 
-    private static $threadList = [];
-    private static $threadLog = [];
-    private static $threadLogChrono = [];
-    private static $threadLogEnabled = false;
+    // thread log and list singleton
+    private static $threadLog = null;
 
     /**
      * Thread constructor.
@@ -48,7 +53,8 @@ class ThreadManager
         $this->startTime = microtime(true);
         $this->uniqueId = uniqid();
         // add current thread to static thread list
-        self::$threadList[$this->uniqueId] = $this;
+        self::checkLogInstance();
+        self::$threadLog->addThreadList($this->uniqueId, $this);
         // log start
         $this->script = $script;
         if (!file_exists($script)) {
@@ -67,6 +73,7 @@ class ThreadManager
             ' > /dev/null 2>/dev/null &';
         self::log($this->uniqueId, "Command : ".$commandLine);
         exec($commandLine);
+        // get pid file reference
         $pidFile = new TempFilesManager(TempFileNameGenerator::getPidFileName($this->uniqueId));
         self::log($this->uniqueId, "Temporary process file : ".$pidFile->getFileName());
         $this->processIdFile = $pidFile->getFileName();
@@ -166,9 +173,11 @@ class ThreadManager
 
     public function __destruct()
     {
-        // remove current thread from static thread list
-        self::log($this->uniqueId, "Killed");
-        unset(self::$threadList[$this->uniqueId]);
+        if (session_status() !== PHP_SESSION_ACTIVE && $_SESSION['']) {
+            // remove current thread from static thread list
+            self::log($this->uniqueId, "Killed");
+            self::$threadLog->removeThread($this->uniqueId);
+        }
     }
 
     /**
@@ -179,10 +188,14 @@ class ThreadManager
      */
     public static function log(string $uniqueId, string $message) : void
     {
-        if (self::$threadLogEnabled) {
-            $timestamp = microtime(true);
-            self::$threadLog[$uniqueId][$timestamp] = $message;
-            self::$threadLogChrono[$timestamp." : ".$uniqueId] = &self::$threadLog[$uniqueId][$timestamp];
+        self::checkLogInstance();
+        if (self::$threadLog->isThreadLogEnabled()) {
+            list($microtime, $timestamp) = explode(' ', microtime());
+            $timestamp = $timestamp . str_pad(substr($microtime, 2), 6, '0', STR_PAD_LEFT);
+            self::$threadLog
+                ->addThreadLog($uniqueId, $timestamp, $message)
+                ->addThreadLogChrono($uniqueId, $timestamp, $message)
+            ;
         }
     }
 
@@ -192,7 +205,22 @@ class ThreadManager
      */
     public static function toggleThreadLog(bool $flag)
     {
-        self::$threadLogEnabled = $flag;
+        self::checkLogInstance();
+        self::$threadLog->setThreadLogEnabled($flag);
+    }
+
+    /**
+     * stores the ThreadLog instance in self::threadLog
+     */
+    public static function checkLogInstance() : void
+    {
+        if (is_null(self::$threadLog)) {
+            if (isset($_SESSION[SESSION_THREAD_LOG])) {
+                self::$threadLog = unserialize($_SESSION[SESSION_THREAD_LOG]);
+            } else {
+                self::$threadLog = ThreadLog::getInstance();
+            }
+        }
     }
 
     /**
@@ -204,7 +232,7 @@ class ThreadManager
         echo "#################################################################".PHP_EOL;
         echo "THREADS LOG".PHP_EOL;
         echo "#################################################################".PHP_EOL;
-        if (!self::$threadLogEnabled) {
+        if (!self::$threadLog->isThreadLogEnabled()) {
             echo "Logs are disabled".PHP_EOL;
         }
     }
@@ -214,8 +242,9 @@ class ThreadManager
      */
     public static function showAllLogs()
     {
+        self::checkLogInstance();
         self::logHeader();
-        foreach (self::$threadLog as $threadId => $thread) {
+        foreach (self::$threadLog->getThreadLog() as $threadId => $thread) {
             self::showLog($threadId);
         }
     }
@@ -223,23 +252,76 @@ class ThreadManager
     /**
      * ouputs threads log by chronological order
      */
-    public static function showAllLogsChrono()
+    public static function showAllLogsChrono() : void
     {
         self::logHeader();
-        foreach (self::$threadLogChrono as $stamp => $message) {
-            echo $stamp." : ".$message.PHP_EOL;
+        foreach (self::$threadLog->getThreadLogChrono() as $timestamp => $message) {
+            echo $timestamp." : ".$message.PHP_EOL;
         }
     }
 
-    public static function showLog(string $threadId)
+    /**
+     * @param string $threadId
+     * @throws \Exception
+     */
+    public static function showLog(string $threadId) : void
     {
-        if (!isset(self::$threadLog[$threadId])) {
+        echo "THREAD ID : ".$threadId.PHP_EOL;
+        if (is_null(self::$threadLog->getThreadLog($threadId))) {
             // @todo manage Exception for thread not found in thread list
             throw new \Exception("Thread $threadId not found");
         }
-        echo "THREAD ID : ".$threadId.PHP_EOL;
-        foreach (self::$threadLog[$threadId] as $timeStamp => $entry) {
-            echo $threadId." : ".$timeStamp." : ".$entry.PHP_EOL;
+        foreach (self::$threadLog->getThreadLog($threadId) as $timestamp => $entry) {
+            echo $threadId." : ".$timestamp." : ".$entry.PHP_EOL;
         }
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function __sleep()
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION[SESSION_THREAD_LOG] = serialize(self::$threadLog);
+        } else {
+            // @todo create more explicit Exception for 'Session not active, cannot wake up the Thread logger'
+            throw new \Exception('Session not active, cannot put the Thread logger to sleep');
+        }
+        return [
+            'startTime',
+            'endTime',
+            'script',
+            'timeout',
+            'args',
+            'commFile',
+            'processIdFile',
+            'processId',
+            'uniqueId',
+            'output',
+        ];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function __wakeup()
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            if (is_null(self::$threadLog)) {
+//                self::$threadLog = unserialize($_SESSION['bunkermaster_multiproc_threadLog']);
+            }
+        } else {
+            // @todo create more explicit Exception for 'Session not active, cannot wake up the Thread logger'
+            throw new \Exception('Session not active, cannot wake up the Thread logger');
+        }
+    }
+
+    /**
+     * @return ThreadLog
+     */
+    public static function getThreadLog() : ThreadLog
+    {
+        return self::$threadLog;
     }
 }
