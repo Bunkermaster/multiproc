@@ -4,5 +4,6 @@ MultiProc is a simple multi process management project. The goal is to be able t
 ***Warning : this is a pre-alpha and should NOT be used in production unless you really want things to go tits up.***
 
 # Docs (WIP)
-* [Install](doc/install.md)
-* [Basic usage](doc/basic-usage.md)
+* [Install](/doc/install.md)
+* [Basic usage](/doc/basic-usage.md)
+* [Multi script via Session](/doc/multi-script-via-session.md)
