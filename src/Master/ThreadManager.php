@@ -68,7 +68,7 @@ class ThreadManager
         self::log($this->uniqueId, "Command : ".$commandLine);
         exec($commandLine);
         $pidFile = new TempFilesManager(TempFileNameGenerator::getPidFileName($this->uniqueId));
-        self::log($this->uniqueId, "Temporary result file : ".$pidFile->getFileName());
+        self::log($this->uniqueId, "Temporary process file : ".$pidFile->getFileName());
         $this->processIdFile = $pidFile->getFileName();
         // flag for absence of pid file
         $noPidFile = true;
