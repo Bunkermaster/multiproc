@@ -39,8 +39,11 @@ class Thread
 
     /**
      * Thread init.
+     * @param array $argv
+     * @throws NoUidSpecifiedException
+     * @throws ProcessIdNotFoundException
      */
-    public static function init(): void
+    public static function init($argv = []): void
     {
         // output buffer capture for output file
         ob_start();
@@ -52,6 +55,7 @@ class Thread
         // construct output file name
         self::$outputFile = TempFileNameGenerator::getResultFileName(self::$uniqueId);
         self::$cleanUpObj = new CleanUp();
+        self::$arguments = array_slice($argv, 3);
     }
 
     /**
