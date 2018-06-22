@@ -2,18 +2,14 @@
 
 namespace Bunkermaster\Multiproc\Servant;
 
-use const Bunkermaster\Multiproc\Config\{
-    DEFAULT_TIME_OUT,
-    OPTION_FLAG_TIMEOUT,
-    OUTPUT_FILE_EXTENSION,
-    OPTION_FLAG_UID,
-    PROCESS_ID_FILE_EXTENSION,
-    TEMP_FILE_PREFIX
-};
-use Bunkermaster\Multiproc\Exception\{
-    NoUidSpecifiedException,
-    ProcessIdNotFoundException
-};
+use const Bunkermaster\Multiproc\Config\DEFAULT_TIME_OUT;
+use const Bunkermaster\Multiproc\Config\OPTION_FLAG_TIMEOUT;
+use const Bunkermaster\Multiproc\Config\OUTPUT_FILE_EXTENSION;
+use const Bunkermaster\Multiproc\Config\OPTION_FLAG_UID;
+use const Bunkermaster\Multiproc\Config\PROCESS_ID_FILE_EXTENSION;
+use const Bunkermaster\Multiproc\Config\TEMP_FILE_PREFIX;
+use Bunkermaster\Multiproc\Exception\NoUidSpecifiedException;
+use Bunkermaster\Multiproc\Exception\ProcessIdNotFoundException;
 use Bunkermaster\Multiproc\Helper\TempFileNameGenerator;
 use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
@@ -42,7 +38,7 @@ class Thread
     /**
      * Thread init.
      */
-    public static function init() :  void
+    public static function init(): void
     {
         // output buffer capture for output file
         ob_start();
@@ -60,7 +56,7 @@ class Thread
      * @throws NoUidSpecifiedException
      * @throws ProcessIdNotFoundException
      */
-    private static function check() : void
+    private static function check(): void
     {
         if (!isset(getopt(OPTION_FLAG_UID.':hp:')[OPTION_FLAG_UID])
             || false === self::$uniqueId = getopt('u:hp:')['u']) {
@@ -78,8 +74,9 @@ class Thread
 
     /**
      * kills current script if timeout
+     * @return void
      */
-    public static function checkTimeout()
+    public static function checkTimeout(): void
     {
         if (microtime(true) > self::getTimeout()) {
             self::$output = json_encode(["An error occured, timeout was reached",
@@ -93,7 +90,7 @@ class Thread
     /**
      * @return int|null
      */
-    public static function getProcessId() : ?int
+    public static function getProcessId(): ?int
     {
         return self::$processId;
     }
@@ -101,7 +98,7 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getOutputFile() : ?string
+    public static function getOutputFile(): ?string
     {
         return self::$outputFile;
     }
@@ -109,7 +106,7 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getProcessIdFile() : ?string
+    public static function getProcessIdFile(): ?string
     {
         return self::$processIdFile;
     }
@@ -117,15 +114,15 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getUniqueId() : ?string
+    public static function getUniqueId(): ?string
     {
         return self::$uniqueId;
     }
 
     /**
-     * @param null string $output
+     * @param null|string $output
      */
-    public static function setOutput(string $output) : void
+    public static function setOutput(string $output): void
     {
         self::$output = $output;
     }
@@ -133,7 +130,7 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getOutput() : ?string
+    public static function getOutput(): ?string
     {
         return self::$output;
     }
@@ -141,7 +138,7 @@ class Thread
     /**
      * @return float|null
      */
-    public static function getTimeout() : ?float
+    public static function getTimeout(): ?float
     {
         return self::$timeout;
     }

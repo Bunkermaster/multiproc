@@ -148,6 +148,7 @@ class ThreadManager
     /**
      * kill thread and clean $commFile
      * @return bool
+     * @throws \Exception
      */
     public function terminate(): bool
     {
