@@ -20,20 +20,22 @@ use Bunkermaster\Multiproc\Helper\TempFilesManager;
  */
 class Thread
 {
-    /** @var null|int current script process id */
+    /** @var null|int $processId current script process id */
     private static $processId = null;
-    /** @var null|string execution output string */
+    /** @var null|string $output execution output string */
     private static $output = null;
-    /** @var null|string execution output file */
+    /** @var null|string $outputFile execution output file */
     private static $outputFile = null;
-    /** @var null|string process ID file name */
+    /** @var null|string $processIdFile process ID file name */
     private static $processIdFile = null;
-    /** @var null|string process unique ID */
+    /** @var null|string $uniqueId process unique ID */
     private static $uniqueId = null;
-    /** @var null|CleanUp end of script management file */
+    /** @var null|CleanUp $cleanUpObj end of script management file */
     private static $cleanUpObj = null;
-    /** @var null|float timeout micro timestamp */
+    /** @var null|float $timeout timeout micro timestamp */
     private static $timeout = null;
+    /** @var null|array $arguments thread arguments */
+    private static $arguments = null;
 
     /**
      * Thread init.
@@ -142,4 +144,27 @@ class Thread
     {
         return self::$timeout;
     }
+
+    /**
+     * @param int $index
+     * @return string|null argument value
+     */
+    public static function getArgument(int $index): ?string
+    {
+        if (!isset(self::$arguments[$index])) {
+            return null;
+        }
+
+        return self::$arguments[$index];
+    }
+
+    /**
+     * @return array|null
+     */
+    public static function getArguments(): ?array
+    {
+        return self::$arguments;
+    }
+
+
 }

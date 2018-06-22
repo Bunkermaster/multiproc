@@ -60,18 +60,25 @@ class ThreadManager
         // log start
         $this->script = $script;
         if (!file_exists($script)) {
-            throw new ScriptNotFoundException('Script requested "'.$script.'"was not found on filesystem');
+            throw new ScriptNotFoundException(sprintf('Script requested "%s"was not found on filesystem', $script));
         }
         $this->timeout = $timeout;
         $this->args = $args;
+        $argsString = '';
+        if (count($this->args) > 0) {
+            $this->args = \array_map('escapeshellarg', $this->args);
+            $argsString = ' '.implode(' ', $this->args);
+        }
         // temporary file names generation
         $tempResultFile = new TempFilesManager(TempFileNameGenerator::getResultFileName($this->uniqueId));
         self::log($this->uniqueId, "Temporary result file is : ".$tempResultFile->getFileName());
         $this->commFile = $tempResultFile->getFileName();
         $execLimit = $this->startTime + $this->timeout;
+        // command line generation
         $commandLine = 'php '.$this->script.
             ' -'.OPTION_FLAG_UID.$this->uniqueId.
             ' -'.OPTION_FLAG_TIMEOUT.$execLimit.
+            $argsString.
             ' > /dev/null 2>/dev/null &';
         self::log($this->uniqueId, "Command : ".$commandLine);
         exec($commandLine);
@@ -85,13 +92,13 @@ class ThreadManager
         while (microtime(true) < $this->startTime + PID_FILE_CREATION_TIME_OUT) {
             usleep(1000);
             if (file_exists($this->processIdFile)) {
+                $noPidFile = false;
                 $this->processId = file_get_contents($pidFile->getFileName());
                 self::log($this->uniqueId, "PID file found.");
-                $noPidFile = false;
                 break;
             }
         }
-        if ($noPidFile) {
+        if (true === $noPidFile) {
             self::log($this->uniqueId, "No PID file found after initial wait time.");
             // @todo Exception if process id file is not present
             throw new \Exception('process id file is not present ('.$this->processIdFile.')');
@@ -176,7 +183,7 @@ class ThreadManager
 
     public function __destruct()
     {
-        if (session_status() !== PHP_SESSION_ACTIVE && $_SESSION['']) {
+        if (session_status() !== PHP_SESSION_ACTIVE || $_SESSION['']) {
             // remove current thread from static thread list
             self::log($this->uniqueId, "Killed");
             self::$threadLog->removeThread($this->uniqueId);
@@ -259,6 +266,9 @@ class ThreadManager
     {
         self::logHeader();
         foreach (self::$threadLog->getThreadLogChrono() as $timestamp => $message) {
+            if (is_array($message)) {
+                $message = var_export($message, 1);
+            }
             echo $timestamp." : ".$message.PHP_EOL;
         }
     }
