@@ -2,9 +2,11 @@
 
 namespace Bunkermaster\Multiproc\Master;
 
-use const Bunkermaster\Multiproc\Config\{
-    DEFAULT_TIME_OUT, OPTION_FLAG_TIMEOUT, PID_FILE_CREATION_TIME_OUT, OPTION_FLAG_UID, SESSION_THREAD_LOG
-};
+use const Bunkermaster\Multiproc\Config\DEFAULT_TIME_OUT;
+use const Bunkermaster\Multiproc\Config\OPTION_FLAG_TIMEOUT;
+use const Bunkermaster\Multiproc\Config\PID_FILE_CREATION_TIME_OUT;
+use const Bunkermaster\Multiproc\Config\OPTION_FLAG_UID;
+use const Bunkermaster\Multiproc\Config\SESSION_THREAD_LOG;
 use Bunkermaster\Multiproc\Exception\ScriptNotFoundException;
 use Bunkermaster\Multiproc\Helper\TempFileNameGenerator;
 use Bunkermaster\Multiproc\Helper\TempFilesManager;

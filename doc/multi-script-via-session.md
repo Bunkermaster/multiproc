@@ -6,4 +6,4 @@ The ThreadManager can be pushed in session and it will push the ThreadLog to ses
 
 ***This process will be optimized at a later date to make use of the ThreadLog storage of all ThreadManager instances.***
 
-[See example](/Tests/test-session-step-1.php)
+[See example](/examples/test-session-step-1.php)
