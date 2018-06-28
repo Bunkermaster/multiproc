@@ -18,10 +18,10 @@ if (PHP_SAPI !== 'cli') {
 // turn logging on
 ThreadManager::toggleThreadLog(true);
 
-$thread = new ThreadManager(__DIR__.DIRECTORY_SEPARATOR."simple-servant-instant-response-with-params.php", 5, ['un', 'dos', 'tres']);
+$thread = new ThreadManager(__DIR__.DIRECTORY_SEPARATOR."simple-servant-instant-response-with-params.php", 5, ['cinq', 'quatre', 'trois', 'deux', 'un']);
 echo "New thread started > process id:".$thread->getProcessId().
     " > uniqueId:".$thread->getUniqueId().
-    " will return 'Bingo!'".
+    " will return 'Pasteque!' et les parametres".
     PHP_EOL;
 while (!$thread->result()) {
     echo "Waiting ".time().PHP_EOL;

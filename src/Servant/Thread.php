@@ -65,7 +65,7 @@ class Thread
     private static function check(): void
     {
         if (!isset(getopt(OPTION_FLAG_UID.':hp:')[OPTION_FLAG_UID])
-            || false === self::$uniqueId = getopt('u:hp:')['u']) {
+            || false === self::$uniqueId = getopt('u:hp:')[OPTION_FLAG_UID]) {
             throw new NoUidSpecifiedException(__FILE__." was called without a UID in --uid CLI option.");
         }
         if (isset(getopt(OPTION_FLAG_TIMEOUT.':hp:')[OPTION_FLAG_TIMEOUT])) {

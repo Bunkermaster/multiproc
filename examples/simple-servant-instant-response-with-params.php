@@ -16,5 +16,5 @@ declare(ticks=1);
 register_tick_function('Bunkermaster\Multiproc\Servant\Thread::checkTimeout');
 sleep(1);
 
-echo "Bingo!".PHP_EOL;
+echo "Pasteque!".PHP_EOL;
 echo var_export(Thread::getArguments());
