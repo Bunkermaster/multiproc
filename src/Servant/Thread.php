@@ -2,18 +2,14 @@
 
 namespace Bunkermaster\Multiproc\Servant;
 
-use const Bunkermaster\Multiproc\Config\{
-    DEFAULT_TIME_OUT,
-    OPTION_FLAG_TIMEOUT,
-    OUTPUT_FILE_EXTENSION,
-    OPTION_FLAG_UID,
-    PROCESS_ID_FILE_EXTENSION,
-    TEMP_FILE_PREFIX
-};
-use Bunkermaster\Multiproc\Exception\{
-    NoUidSpecifiedException,
-    ProcessIdNotFoundException
-};
+use const Bunkermaster\Multiproc\Config\DEFAULT_TIME_OUT;
+use const Bunkermaster\Multiproc\Config\OPTION_FLAG_TIMEOUT;
+use const Bunkermaster\Multiproc\Config\OUTPUT_FILE_EXTENSION;
+use const Bunkermaster\Multiproc\Config\OPTION_FLAG_UID;
+use const Bunkermaster\Multiproc\Config\PROCESS_ID_FILE_EXTENSION;
+use const Bunkermaster\Multiproc\Config\TEMP_FILE_PREFIX;
+use Bunkermaster\Multiproc\Exception\NoUidSpecifiedException;
+use Bunkermaster\Multiproc\Exception\ProcessIdNotFoundException;
 use Bunkermaster\Multiproc\Helper\TempFileNameGenerator;
 use Bunkermaster\Multiproc\Helper\TempFilesManager;
 
@@ -24,25 +20,30 @@ use Bunkermaster\Multiproc\Helper\TempFilesManager;
  */
 class Thread
 {
-    /** @var null|int current script process id */
+    /** @var null|int $processId current script process id */
     private static $processId = null;
-    /** @var null|string execution output string */
+    /** @var null|string $output execution output string */
     private static $output = null;
-    /** @var null|string execution output file */
+    /** @var null|string $outputFile execution output file */
     private static $outputFile = null;
-    /** @var null|string process ID file name */
+    /** @var null|string $processIdFile process ID file name */
     private static $processIdFile = null;
-    /** @var null|string process unique ID */
+    /** @var null|string $uniqueId process unique ID */
     private static $uniqueId = null;
-    /** @var null|CleanUp end of script management file */
+    /** @var null|CleanUp $cleanUpObj end of script management file */
     private static $cleanUpObj = null;
-    /** @var null|float timeout micro timestamp */
+    /** @var null|float $timeout timeout micro timestamp */
     private static $timeout = null;
+    /** @var null|array $arguments thread arguments */
+    private static $arguments = null;
 
     /**
      * Thread init.
+     * @param array $argv
+     * @throws NoUidSpecifiedException
+     * @throws ProcessIdNotFoundException
      */
-    public static function init() :  void
+    public static function init($argv = []): void
     {
         // output buffer capture for output file
         ob_start();
@@ -54,16 +55,17 @@ class Thread
         // construct output file name
         self::$outputFile = TempFileNameGenerator::getResultFileName(self::$uniqueId);
         self::$cleanUpObj = new CleanUp();
+        self::$arguments = array_slice($argv, 3);
     }
 
     /**
      * @throws NoUidSpecifiedException
      * @throws ProcessIdNotFoundException
      */
-    private static function check() : void
+    private static function check(): void
     {
         if (!isset(getopt(OPTION_FLAG_UID.':hp:')[OPTION_FLAG_UID])
-            || false === self::$uniqueId = getopt('u:hp:')['u']) {
+            || false === self::$uniqueId = getopt('u:hp:')[OPTION_FLAG_UID]) {
             throw new NoUidSpecifiedException(__FILE__." was called without a UID in --uid CLI option.");
         }
         if (isset(getopt(OPTION_FLAG_TIMEOUT.':hp:')[OPTION_FLAG_TIMEOUT])) {
@@ -78,8 +80,9 @@ class Thread
 
     /**
      * kills current script if timeout
+     * @return void
      */
-    public static function checkTimeout()
+    public static function checkTimeout(): void
     {
         if (microtime(true) > self::getTimeout()) {
             self::$output = json_encode(["An error occured, timeout was reached",
@@ -93,7 +96,7 @@ class Thread
     /**
      * @return int|null
      */
-    public static function getProcessId() : ?int
+    public static function getProcessId(): ?int
     {
         return self::$processId;
     }
@@ -101,7 +104,7 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getOutputFile() : ?string
+    public static function getOutputFile(): ?string
     {
         return self::$outputFile;
     }
@@ -109,7 +112,7 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getProcessIdFile() : ?string
+    public static function getProcessIdFile(): ?string
     {
         return self::$processIdFile;
     }
@@ -117,15 +120,15 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getUniqueId() : ?string
+    public static function getUniqueId(): ?string
     {
         return self::$uniqueId;
     }
 
     /**
-     * @param null string $output
+     * @param null|string $output
      */
-    public static function setOutput(string $output) : void
+    public static function setOutput(string $output): void
     {
         self::$output = $output;
     }
@@ -133,7 +136,7 @@ class Thread
     /**
      * @return string|null
      */
-    public static function getOutput() : ?string
+    public static function getOutput(): ?string
     {
         return self::$output;
     }
@@ -141,8 +144,31 @@ class Thread
     /**
      * @return float|null
      */
-    public static function getTimeout() : ?float
+    public static function getTimeout(): ?float
     {
         return self::$timeout;
     }
+
+    /**
+     * @param int $index
+     * @return string|null argument value
+     */
+    public static function getArgument(int $index): ?string
+    {
+        if (!isset(self::$arguments[$index])) {
+            return null;
+        }
+
+        return self::$arguments[$index];
+    }
+
+    /**
+     * @return array|null
+     */
+    public static function getArguments(): ?array
+    {
+        return self::$arguments;
+    }
+
+
 }

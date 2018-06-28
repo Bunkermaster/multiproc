@@ -34,7 +34,6 @@ class TempFilesManager
         }
         $this->fileName = $tempDir."/".$fileName;
         if (!is_null($content) && file_exists($this->fileName)) {
-            // @todo Exception if temp file failed to create
             throw new \Exception('Exception if temp temp file failed to create ('.$this->fileName.')');
         }
         if (!is_null($content)) {
